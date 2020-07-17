@@ -102,15 +102,25 @@
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
     SEL selector = [invocation selector];
-    BOOL responded = NO;
+    __block BOOL responded = NO;
     
     NSArray *copiedDelegates = [_delegates copy];
+    /// MARK: bug fix
+    /// *** Collection <NSConcretePointerArray: 0x283e38500> was mutated while being enumerated. (null)
+    [copiedDelegates enumerateObjectsUsingBlock:^(id  _Nonnull delegate, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (delegate && [delegate respondsToSelector:selector]) {
+            [invocation invokeWithTarget:delegate];
+            responded = YES;
+        }
+    }];
+    /*
     for (id delegate in copiedDelegates) {
         if (delegate && [delegate respondsToSelector:selector]) {
             [invocation invokeWithTarget:delegate];
             responded = YES;
         }
     }
+     */
     
     if (!responded && !self.silentWhenEmpty)
         [self doesNotRecognizeSelector:selector];
