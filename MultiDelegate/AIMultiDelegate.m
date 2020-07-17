@@ -104,7 +104,8 @@
     SEL selector = [invocation selector];
     __block BOOL responded = NO;
     
-    NSArray *copiedDelegates = [_delegates copy];
+    NSArray *copiedDelegates = [[_delegates allObjects] copy];
+    
     /// MARK: bug fix
     /// *** Collection <NSConcretePointerArray: 0x283e38500> was mutated while being enumerated. (null)
     [copiedDelegates enumerateObjectsUsingBlock:^(id  _Nonnull delegate, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -114,6 +115,7 @@
         }
     }];
     /*
+    NSArray *copiedDelegates = [_delegates copy];
     for (id delegate in copiedDelegates) {
         if (delegate && [delegate respondsToSelector:selector]) {
             [invocation invokeWithTarget:delegate];
